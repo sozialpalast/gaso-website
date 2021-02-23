@@ -1,0 +1,24 @@
+{
+  "name": "gaso-website",
+  "version": "1.0.0",
+  "description": "Website für das Gasometer Münster",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sozialpalast/gaso-website.git"
+  },
+  "author": "Mala",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sozialpalast/gaso-website/issues"
+  },
+  "homepage": "https://github.com/sozialpalast/gaso-website#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "handlebars": "^4.7.7",
+    "sequelize": "^6.5.0"
+  }
+}
