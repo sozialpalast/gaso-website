@@ -1,0 +1,11 @@
+{
+    "stylesheetLink": "/static/stylesheets/main.css",
+    "title": "gaso_ms",
+    "mainLogoLink": "/static/img/gaso.svg",
+    "mainMenu": [
+        {
+            "link": "/",
+            "text": "Home"
+        }
+    ]
+}

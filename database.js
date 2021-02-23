@@ -1,18 +1,14 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
 class database {
-    async constructor(auto = true, connectionString) {
-        if (auto) {
-            this.createConnection(connectionString);
-            this.loadModel();
-            await this.syncModel();
-        }
+    constructor(connectionString) {
+        this.connectionString = connectionString;
     }
-    createConnection(connectionString) {
-        this.sequelize = new Sequelize(connectionString);
+    createConnection() {
+        this.sequelize = new Sequelize(this.connectionString);
     }
     loadModel() {
-        const user = this.sequelize.define("user", {
+        this.user = this.sequelize.define("user", {
             "username": {
                 type: DataTypes.STRING
             },
@@ -36,7 +32,7 @@ class database {
             }
 
         })
-        const post = this.sequelize.define("post", {
+        this.post = this.sequelize.define("post", {
             "title": {
                 type: DataTypes.STRING
             },
@@ -58,7 +54,7 @@ class database {
                 defaultValue: null
             }
         })
-        const staticPage = this.sequelize.define("staticPage", {
+        this.staticPage = this.sequelize.define("staticPage", {
             "title": {
                 type: DataTypes.STRING
             },
@@ -75,7 +71,7 @@ class database {
                 defaultValue: null
             }
         })
-        const category = this.sequelize.define("category", {
+        this.category = this.sequelize.define("category", {
             "title": {
                 type: DataTypes.STRING
             },
@@ -84,29 +80,31 @@ class database {
             }
         })
         
-        const translation = this.sequelize.define("translation", {
+        this.translation = this.sequelize.define("translation", {
             "content": DataTypes.TEXT,
             "translatedBy": DataTypes.INTEGER
         })
 
 
-        const menuItem = this.sequelize.define("menuItem", {
+        this.menuItem = this.sequelize.define("menuItem", {
             "title": DataTypes.STRING,
             "alt": DataTypes.STRING
         })
 
         //wooohoo relations
-        user.hasOne(user, { foreignKey: "createdBy" });
-        user.hasMany(post);
-        post.belongsTo(user, {foreignKey: "postedBy"});
-        user.hasMany(staticPage);
-        staticPage.belongsTo(user, { foreignKey: "postedBy" });
-        staticPage.belongsToMany(category);
-        post.belongsToMany(category);
-        menuItem.belongsTo(staticPage);
-        translation.hasOne(user, {foreignKey: "translatedBy"});
-        staticPage.hasMany(translation);
-        post.hasMany(translation)
+        this.user.hasOne(this.user, { foreignKey: "createdBy" });
+        this.user.hasMany(this.post);
+        this.post.belongsTo(this.user, {foreignKey: "postedBy"});
+        this.user.hasMany(this.staticPage);
+        this.staticPage.belongsTo(this.user, { foreignKey: "postedBy" });
+        this.staticPage.belongsToMany(this.category, { through: "staticPageCategory" });
+        this.category.belongsToMany(this.staticPage, { through: "staticPageCategory" });
+        this.post.belongsToMany(this.category, { through: "postCategory" });
+        this.category.belongsToMany(this.post, { through: "postCategory"})
+        this.menuItem.belongsTo(this.staticPage);
+        this.translation.belongsTo(this.user, {foreignKey: "translatedBy"});
+        this.staticPage.hasMany(this.translation);
+        this.post.hasMany(this.translation)
 
     }
     async syncModel() {
@@ -114,3 +112,4 @@ class database {
         return;
     }
 }
+module.exports = database;

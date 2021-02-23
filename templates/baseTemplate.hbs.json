@@ -4,9 +4,8 @@
   "mainLogoLink": "",
   "mainMenu": [
     {
-      "link": "blah",
-      "text": "blubb.html"
+      "link": "",
+      "text": ""
     }
-  ],
-  "template": "templates/partials/landing"
+  ]
 }
