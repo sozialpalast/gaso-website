@@ -1,10 +1,11 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
 class database {
-    constructor(auto = true, connectionString) {
+    async constructor(auto = true, connectionString) {
         if (auto) {
             this.createConnection(connectionString);
             this.loadModel();
+            await this.syncModel();
         }
     }
     createConnection(connectionString) {
@@ -27,10 +28,6 @@ class database {
             "isAdmin": {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false
-            },
-            "joined": {
-                type: DataTypes.DATE,
-                defaultValue: this.sequelize.NOW
             },
             "createdBy": {
                 type: DataTypes.INTEGER,
@@ -86,14 +83,20 @@ class database {
                 type: DataTypes.STRING
             }
         })
-        const menuItem = this.sequelize.define("menuItem", {
-            "title": DataTypes.STRING,
-            "alt": DataTypes.STRING
-        })
+        
         const translation = this.sequelize.define("translation", {
             "content": DataTypes.TEXT,
             "translatedBy": DataTypes.INTEGER
         })
+
+
+        const menuItem = this.sequelize.define("menuItem", {
+            "title": DataTypes.STRING,
+            "alt": DataTypes.STRING
+        })
+
+        //wooohoo relations
+        user.hasOne(user, { foreignKey: "createdBy" });
         user.hasMany(post);
         post.belongsTo(user, {foreignKey: "postedBy"});
         user.hasMany(staticPage);

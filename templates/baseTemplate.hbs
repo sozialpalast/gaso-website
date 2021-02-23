@@ -1,0 +1,21 @@
+<!-- BaseTemplate -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" ref="{{{stylesheetLink}}}" />
+        <title>{{title}}</title>
+    </head>
+    <body>
+        <div id="mainLogo" class="mainLogo"><img src="{{{mainLogoLink}}}" /></div>
+        <div class="mainMenu">
+            <ul class="mainMenu mainMenuList">
+                {{#each mainMenu}}
+                <li class="mainMenuItem"><a class="mainMenuItem" href="{{{link}}}">{{text}}</a></li>
+                {{/each}}
+            </ul>
+        </div>
+        <div class="content">
+            {{> (lookup . "template")}}
+        </div>
+    </body>
+</html>

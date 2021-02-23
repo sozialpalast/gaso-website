@@ -1,0 +1,12 @@
+{
+  "stylesheetLink": "",
+  "title": "",
+  "mainLogoLink": "",
+  "mainMenu": [
+    {
+      "link": "blah",
+      "text": "blubb.html"
+    }
+  ],
+  "template": "templates/partials/landing"
+}
