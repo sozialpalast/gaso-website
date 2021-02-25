@@ -1,6 +1,7 @@
 const handlebars = require("handlebars");
 const fs = require("fs/promises");
 const database = require("./database.js");
+
 class template extends database {
     constructor() {
         super();
@@ -8,7 +9,8 @@ class template extends database {
         this.baseTemplates = {};
         this.partials = {};
         this.baseTemplateFiles = {}
-              
+        this.translations = {}
+        this.htmls = {};
 
     }
     
@@ -17,6 +19,7 @@ class template extends database {
         try {
             let baseTemplateList = await fs.readdir("templates");
             let partialList = await fs.readdir("templates/partials");
+            let translationsList = await fs.readdir("translations");
             for await (const file of baseTemplateList) {
                 if (file.substr(file.length - 4) == ".hbs") {
                     console.log("Reading ", file)
@@ -29,6 +32,16 @@ class template extends database {
                     handlebars.registerPartial(file.substr(0, file.length - 4), await fs.readFile("templates/partials/" + file, { encoding: "utf-8" }));
                 }
             }
+            for await (const file of translationsList) {
+                if (file.substr(file.length - 5) == ".json") {
+                    console.log("Reading Translation ", file);
+                    try {
+                        this.translations[file.substr(0, file.length - 5)] = JSON.parse(await fs.readFile("translations/" + file, { encoding: "utf-8" }));
+                    } catch (e) {
+                        throw e;
+                    }
+                }
+            }
         } catch (e) {
             throw e;
         }
@@ -39,6 +52,7 @@ class template extends database {
         for (var template in this.baseTemplateFiles) {
             console.log("Compiling " + template + "...");
             this.baseTemplates[template] = handlebars.compile(this.baseTemplateFiles[template]);
+            console.log("Compiled ", template)
         }
         
     }
@@ -52,16 +66,34 @@ class template extends database {
     async loadStandardData() {
         this.standardData = JSON.parse(await fs.readFile("./standardData.json", "utf-8"));
     }
-    renderTemplate(baseTemplate, data, useStandardData = true) {
+    async renderTemplate(baseTemplate, template = "NoTemplate", translation = this.config.standardLang, data, write = true, useStandardData = true) {
+        data = { ...{ translation: this.translations[translation] }, ...data };
+        data.template = template;
+        console.log(data);
         if (useStandardData) {
             data = { ...this.standardData, ...data };
         }
-        if (this.baseTemplates[baseTemplate] == undefined) 
-            return Error("Template " + baseTemplate + " not compiled");
+        if (this.baseTemplates[baseTemplate] == undefined) {
+            console.log(this.baseTemplates, baseTemplate);
+            throw Error("Template " + baseTemplate + " not compiled");
+        }
         console.log("Rendering " + baseTemplate);
-        return this.baseTemplates[baseTemplate](data);
+        let content = this.baseTemplates[baseTemplate](data);
+        if (!this.htmls[baseTemplate])
+            this.htmls[baseTemplate] = {};
+        if (!this.htmls[baseTemplate][template]) 
+            this.htmls[baseTemplate][template] = {}
+        this.htmls[baseTemplate][template][translation] = content;
+        if (write) {
+            await fs.writeFile("tmp/" + baseTemplate + template + translation+ ".html", content, "utf-8");
+        }
+        return content;
     }
-    async renderStaticPages() {
+    async renderLanding() {
+        console.log(" RENDER BASE ")
+        await this.renderTemplate(this.config.homepageBaseTemplate, this.config.homepageTemplate, this.config.standardLang, {});
+    }
+    async renderAllStaticPages() {
         let staticPageData = await this.staticPage.findAll({
             include: [
                 {
@@ -74,6 +106,7 @@ class template extends database {
             ]
             
         })
+        console.log(staticPageData);
     }
 }
 

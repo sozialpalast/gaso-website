@@ -1,11 +1,30 @@
 const { Sequelize, DataTypes } = require('sequelize');
+const fs = require("fs/promises");
+const crypto = require('crypto');
+
+function makeid(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
 
 class database {
     constructor(connectionString) {
         this.connectionString = connectionString;
+        var { Op } = require("sequelize");
+        this.Op = Op;
+    }
+    async loadConfig() {
+        this.config = JSON.parse(await fs.readFile("config.json", "utf-8"));
     }
     createConnection() {
-        this.sequelize = new Sequelize(this.connectionString);
+        this.sequelize = new Sequelize(this.connectionString, {
+            "logging": false
+        });
     }
     loadModel() {
         this.user = this.sequelize.define("user", {
@@ -52,6 +71,10 @@ class database {
                 type: DataTypes.DATE,
                 allowNull: true,
                 defaultValue: null
+            },
+            "visible": {
+                type: DataTypes.BOOLEAN,
+                defaultValue: true
             }
         })
         this.staticPage = this.sequelize.define("staticPage", {
@@ -82,6 +105,7 @@ class database {
         
         this.translation = this.sequelize.define("translation", {
             "content": DataTypes.TEXT,
+            "language": DataTypes.STRING,
             "translatedBy": DataTypes.INTEGER
         })
 
@@ -106,6 +130,10 @@ class database {
         this.staticPage.hasMany(this.translation);
         this.post.hasMany(this.translation)
 
+    }
+    async createUser(data) {
+        data.salt = makeid(255);
+        data.password = crypto.createHash('sha256').update(data.salt + data.password + data.salt).digest('hex');
     }
     async syncModel() {
         await this.sequelize.sync();

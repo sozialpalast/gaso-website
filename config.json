@@ -1,3 +1,8 @@
 {
-    "sequelize_db": "sqlite:./db.sqlite"
+    "sequelize_db": "sqlite:./db.sqlite",
+    "cookieSecret": "yeet",
+    "standardLang": "de_DE",
+    "homepageBaseTemplate": "baseTemplate",
+    "homepageTemplate": "landing",
+    "webserverPort": 8081
 }

@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/sozialpalast/gaso-website#readme",
   "dependencies": {
+    "crypto": "^1.0.1",
     "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "handlebars": "^4.7.7",
     "sequelize": "^6.5.0",
     "sqlite3": "^5.0.2"

@@ -5,16 +5,16 @@ class main extends webserver {
     constructor() {
         super();
     }
-    async loadConfig() {
-        this.config = JSON.parse(await fs.readFile("config.json", "utf-8"));
-    }
+    
     async init() {
         await this.loadConfig();
         this.connectionString = this.config.sequelize_db;
-        this.initTemplate();
+        await this.initTemplate();
         this.createConnection();
         this.loadModel();
         await this.syncModel();
+        await this.renderLanding();
+        await this.startWebserver(this.config.webserverPort);
     }
 }
 

@@ -1,0 +1,11 @@
+{"mainMenu": [
+    {
+        "link": "/",
+        "text": "Home"
+    }
+],
+"websiteTitle": "Gasometer Münster",
+"username": "Nutzername",
+"password": "Passwort",
+"loginButton": "Einloggen"
+}
