@@ -15,7 +15,14 @@ class main extends webserver {
         await this.syncModel();
         await this.renderLanding();
         await this.startWebserver(this.config.webserverPort);
+        /*console.log(await this.createUser({
+            "username": "mala3",
+            "password": "lol",
+            "isAdmin": true,
+            "displayName": "Mala"
+        }));*/
     }
+    
 }
 
 var thread = new main();

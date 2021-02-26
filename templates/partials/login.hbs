@@ -1,4 +1,5 @@
 {{translation.login}}<br>
+{{#if loginFailed}}{{translation.loginFailed}}<br>{{/if}}
 <form method="POST" action="/backend/login">
     <label for="username">{{translation.username}}:</label> <input type="text" placeholder="{{translation.usernamePlaceholder}}" name="username" /><br>
     <label for="password">{{translation.password}}:</label><input type="password" name="password"><br>

@@ -42,29 +42,108 @@ class webserver extends template {
     }
     async registerBackend() {
         this.app.post("/backend/login", async (req, res) => {
-            req.session.destroy((err) => {
-
-            });
-            let user = await this.user.findOne({
+            
+            let loginUser = await this.user.findOne({
                 where: {
                     [this.Op.and]: {
-                        "username": req.body.username,
-                        "password": crypto.createHash('sha256').update(
-                            this.sequelize.col("salt") + req.body.password + this.sequelize.col("salt")).digest('hex')
+                        "username": req.body.username
+                        
 
                     }
                 }
             });
-            if (user != null) {
-                req.session.user = user;
+            if (loginUser != null && loginUser.correctPassword(req.body.password)) {
+                req.session.user = loginUser;
+                res.redirect("/backend");
+            } else {
+                res.send(await this.renderTemplate("baseTemplate", "login", req.query.lang, {loginFailed: true}, false));
             }
-            res.end(JSON.stringify(user));
+            res.end();
             
         });
         this.app.get("/backend/login", async (req, res) => {
             res.send(await this.renderTemplate("baseTemplate", "login", req.query.lang, {}, false));
             res.end();
         });
+        this.app.get("/backend", async (req, res) => {
+            if (!req.session.user) {
+                res.redirect("/backend/login");
+                res.end();
+                return;
+            }
+            res.send(await this.renderTemplate("adminTemplate", "adminHome", req.query.lang, { user: req.session.user }, false));
+            res.end()
+        });
+        this.app.get("/backend/users", async (req, res) => {
+            if (!req.session.user || !req.session.user.isAdmin) {
+                res.redirect("/backend/login");
+                res.end();
+                return;
+            }
+            let users = await this.user.findAll({ include: "createdByUser" });
+            let userList = [];
+            users.forEach((curr) => {
+                userList.push(curr.dataValues);
+            })
+            let edit = null;
+            if (!(!req.query.edit)) {
+                let uff = await this.user.findOne({
+                    where: {
+                        id: req.query.edit
+                    }
+                });
+                edit = uff.dataValues;
+            }
+            res.send(await this.renderTemplate("adminTemplate", "userOverview", req.query.lang, { user: req.session.user, userList: userList, edit: edit }, false));
+            res.end()
+        });
+        this.app.post("/backend/createUser", async (req, res) => {
+            if (!req.session.user || !req.session.user.isAdmin) {
+                res.redirect("/backend/login");
+                res.end();
+                return;
+            }
+            if (req.body.password == "")
+                req.body.password = undefined;
+                req.body.password2 = undefined
+            if (req.body.password !== req.body.password2) {
+                res.send(this.translations[req.query.lang = this.config.standardLang]["passwordUnmatch"]);
+                res.end();
+                return;
+            }
+            req.body.password2 = undefined
+            
+            if (req.body.deleteUser == "lol") {
+                let usr = await this.user.findOne({
+                    where: {
+                        id: req.body.id
+                    }
+                })
+                await usr.destroy();
+                res.redirect("/backend/users");
+                res.end();
+                return;
+            }
+            req.body.createdBy = req.session.user.id;
+            let [ usr, wasCreated ] = await this.user.findOrCreate({
+                where: {
+                    "username": req.body.username
+                }, defaults: req.body
+            });
+            if (!wasCreated) {
+                for (var i in req.body) {
+                    usr[i] = req.body[i];
+                    if (req.body.isAdmin == "lol") {
+                        usr.isAdmin = true;
+                    } else {
+                        usr.isAdmin = false
+                    }
+                }
+                usr.save();
+            }
+            res.redirect("/backend/users");
+            res.end();
+        })
     }
 
 }

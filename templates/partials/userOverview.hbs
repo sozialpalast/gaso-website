@@ -1,0 +1,42 @@
+<table class="userOverviewTable">
+    <thead>
+        <th>{{translation.ID}}</th>
+        <th>{{translation.username}}</th>
+        <th>{{translation.displayName}}</th>
+        <th>{{translation.isAdmin}}</th>
+        <th>{{translation.createdAt}}</th>
+        <th>{{translation.createdBy}}</th>
+        <th>{{translation.actions}}</th>
+    </thead>
+    <tbody>
+        {{#each userList}}
+        <tr>
+            <td>{{this.id}}</td>
+            <td>{{this.username}}</td>
+            <td>{{this.displayName}}</td>
+            <td><input type="checkbox" disabled {{#if this.isAdmin}}checked{{/if}}></td>
+            <td>{{this.createdAt}}</td>
+            <td>{{this.createdBy}}{{#unless this.createdBy}}/{{/unless}}</td>
+            <td><a href="/backend/users?edit={{this.id}}"><button>{{translation.edit}}</button></a></td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<hr>
+
+<form method="POST" action="/backend/createUser">
+    <label for="username">{{translation.username}}:</label> <input type="text"
+        placeholder="{{translation.usernamePlaceholder}}" name="username" value="{{edit.username}}"/><br>
+
+    <label for="displayName">{{translation.displayName}}:</label> <input type="text"
+        placeholder="{{translation.displayNamePlaceholder}}" name="displayName" value="{{edit.displayName}}"/><br>
+    <label for="password">{{translation.password}}:</label><input type="password" name="password"><br>
+    <label for="password2">{{translation.repeatPassword}}:</label><input type="password" name="password2"><br>
+    <label for="isAdmin">{{translation.isAdminCheckbox}}</label><input type="checkbox" name="isAdmin" value="lol"{{#if edit.isAdmin}}checked{{/if}}/><br>
+    {{#if edit}}
+    <input type="hidden" name="id" value="{{edit.id}}" />
+    <label for="deleteUser">{{translation.deleteUserCheckbox}}</label><input type="checkbox" name="deleteUser" value="lol"/><br>{{/if}}
+
+    <input type="submit" value="{{translation.createUserButton}}">
+</form>

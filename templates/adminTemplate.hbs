@@ -1,0 +1,27 @@
+<!-- AdminTemplate -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" ref="{{{stylesheetLink}}}" />
+    <title>Admin - {{title}}</title>
+</head>
+
+<body>
+    <div id="mainLogo" class="mainLogo"><img src="{{{mainLogoLink}}}" /></div>
+    <div class="adminMenu">
+        <ul class="adminMenu adminMenuList">
+            <li><a href="/backend">{{translation.home}}</a></li>
+            <li><a href="/backend/postOverview">{{translation.postOverview}}</a></li>
+            <li><a href="/backend/createPost">{{translation.createPost}}</a></li>
+            <li><a href="/backend/staticOverview">{{translation.staticOverview}}</a></li>
+            <li><a href="/backend/createStatic">{{translation.createStatic}}</a></li>
+            {{#if user.isAdmin}}<li><a href="/backend/users">{{translation.userOverview}}</a></li>{{/if}}
+        </ul>
+    </div>
+    <div class="content">
+        {{> (lookup . "template")}}
+    </div>
+</body>
+
+</html>

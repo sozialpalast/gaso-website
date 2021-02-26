@@ -23,7 +23,7 @@ class database {
     }
     createConnection() {
         this.sequelize = new Sequelize(this.connectionString, {
-            "logging": false
+            "logging": true
         });
     }
     loadModel() {
@@ -31,11 +31,17 @@ class database {
             "username": {
                 type: DataTypes.STRING
             },
-            "password": {
-                type: DataTypes.STRING
+            password: {
+                type: Sequelize.STRING,
+                get() {
+                    return () => this.getDataValue('password')
+                }
             },
-            "salt": {
-                type: DataTypes.STRING
+            salt: {
+                type: Sequelize.STRING,
+                get() {
+                    return () => this.getDataValue('salt')
+                }
             },
             "displayName": {
                 type: DataTypes.STRING
@@ -115,8 +121,33 @@ class database {
             "alt": DataTypes.STRING
         })
 
+
+        this.user.generateSalt = function () {
+            return crypto.randomBytes(16).toString('base64')
+        }
+        this.user.encryptPassword = function (plainText, salt) {
+            return crypto
+                .createHash('RSA-SHA256')
+                .update(plainText)
+                .update(salt)
+                .digest('hex')
+        }
+        const setSaltAndPassword = user => {
+            if (user.changed('password')) {
+                user.salt = this.user.generateSalt()
+                console.log(user.password(), user.salt(), this.user.encryptPassword(user.password(), user.salt()));
+                user.password = this.user.encryptPassword(user.password(), user.salt())
+            }
+        }
+        this.user.beforeCreate(setSaltAndPassword)
+        this.user.beforeUpdate(setSaltAndPassword)
+        let usr = this.user;
+        this.user.prototype.correctPassword = function (enteredPassword) {
+            console.log(enteredPassword)
+            return usr.encryptPassword(enteredPassword, this.salt()) === this.password()
+        }
         //wooohoo relations
-        this.user.hasOne(this.user, { foreignKey: "createdBy" });
+        this.user.hasOne(this.user, { foreignKey: "createdBy", as: "createdByUser" });
         this.user.hasMany(this.post);
         this.post.belongsTo(this.user, {foreignKey: "postedBy"});
         this.user.hasMany(this.staticPage);
@@ -132,8 +163,8 @@ class database {
 
     }
     async createUser(data) {
-        data.salt = makeid(255);
-        data.password = crypto.createHash('sha256').update(data.salt + data.password + data.salt).digest('hex');
+        return await this.user.create(data);
+
     }
     async syncModel() {
         await this.sequelize.sync();
