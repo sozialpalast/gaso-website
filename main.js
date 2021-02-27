@@ -16,7 +16,7 @@ class main extends webserver {
         await this.renderLanding();
         await this.startWebserver(this.config.webserverPort);
         /*console.log(await this.createUser({
-            "username": "mala3",
+            "username": "mala",
             "password": "lol",
             "isAdmin": true,
             "displayName": "Mala"

@@ -16,8 +16,8 @@
             <td>{{this.displayName}}</td>
             <td><input type="checkbox" disabled {{#if this.isAdmin}}checked{{/if}}></td>
             <td>{{this.createdAt}}</td>
-            <td>{{this.createdBy}}{{#unless this.createdBy}}/{{/unless}}</td>
-            <td><a href="/backend/users?edit={{this.id}}"><button>{{translation.edit}}</button></a></td>
+            <td>{{this.createdByUser.displayName}}{{#unless this.createdByUser}}/{{/unless}}</td>
+            <td><a href="/backend/users?edit={{this.id}}"><button>{{../translation.edit}}</button></a></td>
         </tr>
         {{/each}}
     </tbody>

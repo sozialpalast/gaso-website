@@ -1,0 +1,26 @@
+<table class="postOverviewTable">
+    <thead>
+        <th>{{translation.ID}}</th>
+        <th>{{translation.postName}}</th>
+        <th>{{translation.postCategories}}</th>
+        <th>{{translation.postTranslations}}</th>
+        <th>{{translation.postIsVisible}}</th>
+        <th>{{translation.createdAt}}</th>
+        <th>{{translation.createdBy}}</th>
+        <th>{{translation.actions}}</th>
+    </thead>
+    <tbody>
+        {{#each postList}}
+        <tr>
+            <td>{{this.id}}</td>
+            <td>{{this.title}}</td>
+            <td>{{#each this.categories}}{{this}} {{/each}}</td>
+            <td>{{this.language}} {{#each this.translations}}{{this.language}}{{/each}}</td>
+            <td><input type="checkbox" disabled {{#if this.visible}}checked{{/if}}></td>
+            <td>{{this.createdAt}}</td>
+            <td>{{this.postedByUser.displayName}}{{#unless this.postedByUser}}/{{/unless}}</td>
+            <td><a href="/backend/createPost?edit={{this.id}}"><button>{{../translation.edit}}</button></a></td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>

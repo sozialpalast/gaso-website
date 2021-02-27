@@ -1,0 +1,17 @@
+<h2>{{#if edit}}{{translation.editPostHeader}}{{/if}}
+    {{#unless edit}}{{translation.createPostHeader}}{{/unless}}</h2>
+
+{{#if existed}} <div class="error">{{translation.titleExistedError}}</div>{{/if}}
+<form method="POST" action="/backend/createPost">
+    <label for="title">{{translation.postTitle}}</label>
+    <input type="text" name="title" value="{{edit.title}}"><br>
+    <label for="language">{{translation.languageShortcode}}</label>
+    <input type="text" name="language" value="{{#if edit}}{{edit.language}}{{/if}}{{#unless edit}}{{translation.translationLang}}{{/unless}}" /><br>
+    <textarea name="content">{{edit.content}}</textarea><br>
+    <label for="visible">{{translation.postIsVisible}}</label>
+    <input type="checkbox" name="visible" {{#if edit.visible}}checked{{/if}} value="true"/>
+    {{#if edit}}<input type="hidden" name="edit" value="true">
+    <input type="hidden" name="id" value="{{edit.id}}" />{{/if}}
+    <input type="submit" value="{{translation.createPostButton}}" />
+
+</form>

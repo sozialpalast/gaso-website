@@ -81,7 +81,8 @@ class database {
             "visible": {
                 type: DataTypes.BOOLEAN,
                 defaultValue: true
-            }
+            },
+            "language": DataTypes.STRING
         })
         this.staticPage = this.sequelize.define("staticPage", {
             "title": {
@@ -111,6 +112,16 @@ class database {
         
         this.translation = this.sequelize.define("translation", {
             "content": DataTypes.TEXT,
+            "forPostId": {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+                defaultValue: null
+            },
+            "forStaticId": {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+                defaultValue: null
+            },
             "language": DataTypes.STRING,
             "translatedBy": DataTypes.INTEGER
         })
@@ -149,17 +160,19 @@ class database {
         //wooohoo relations
         this.user.hasOne(this.user, { foreignKey: "createdBy", as: "createdByUser" });
         this.user.hasMany(this.post);
-        this.post.belongsTo(this.user, {foreignKey: "postedBy"});
+        this.post.belongsTo(this.user, {foreignKey: "postedBy", as: "postedByUser"});
         this.user.hasMany(this.staticPage);
-        this.staticPage.belongsTo(this.user, { foreignKey: "postedBy" });
+        this.staticPage.belongsTo(this.user, { foreignKey: "postedBy", as: "postedByUser"});
         this.staticPage.belongsToMany(this.category, { through: "staticPageCategory" });
         this.category.belongsToMany(this.staticPage, { through: "staticPageCategory" });
-        this.post.belongsToMany(this.category, { through: "postCategory" });
-        this.category.belongsToMany(this.post, { through: "postCategory"})
+        this.post.belongsToMany(this.category, { through: "postCategory", as: "postCategories" });
+        this.category.belongsToMany(this.post, { through: "postCategory", as: "postCategories"})
         this.menuItem.belongsTo(this.staticPage);
         this.translation.belongsTo(this.user, {foreignKey: "translatedBy"});
         this.staticPage.hasMany(this.translation);
-        this.post.hasMany(this.translation)
+        this.translation.belongsTo(this.post, { foreignKey: "forPostId" });
+        this.translation.belongsTo(this.staticPage, { foreignKey: "forStaticId" });
+        this.post.hasMany(this.translation, {as: "translations"})
 
     }
     async createUser(data) {
