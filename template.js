@@ -108,6 +108,19 @@ class template extends database {
         })
         console.log(staticPageData);
     }
+    async renderAllPosts() {
+        let postData = await this.post.findAll({
+            include: [
+                "postedByUser",
+                "translations",
+                {
+                    model: this.category,
+                    as: "postCategories",
+                    include: "translations"
+                }
+            ]
+        })
+    }
 }
 
 module.exports = template;

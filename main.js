@@ -20,7 +20,16 @@ class main extends webserver {
             "password": "lol",
             "isAdmin": true,
             "displayName": "Mala"
-        }));*/
+        }));
+        await this.category.create({
+            "title": "Testkategorie 1",
+            "language": "de_DE",
+            "translations": [{
+                "content": "Test Category 1",
+                "language": "en_US"
+            }]
+        }, {include: "translations"});*/
+        
     }
     
 }

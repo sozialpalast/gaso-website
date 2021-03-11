@@ -14,7 +14,7 @@
         <tr>
             <td>{{this.id}}</td>
             <td>{{this.title}}</td>
-            <td>{{#each this.categories}}{{this}} {{/each}}</td>
+            <td>{{#each this.postCategories}}{{this.title}} {{/each}}</td>
             <td>{{this.language}} {{#each this.translations}}{{this.language}}{{/each}}</td>
             <td><input type="checkbox" disabled {{#if this.visible}}checked{{/if}}></td>
             <td>{{this.createdAt}}</td>
@@ -24,3 +24,17 @@
         {{/each}}
     </tbody>
 </table>
+{{#if categories}}
+<div class="categoriesCheckboxes">
+    <h3>{{translation.categories}}:</h3><br>
+    <ul>
+        {{#each categories}}
+        <li>
+            
+            ID {{this.id}}: {{this.title}} - {{this.language}} {{#each this.translations}} {{this.language}} {{/each}}
+        </li>
+        {{/each}}
+        <li><a href="/backend/createCategory" target="_blank">{{translation.addCategory}}</a></li>
+    </ul>
+</div>
+{{/if}}

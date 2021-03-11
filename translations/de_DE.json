@@ -16,7 +16,7 @@
 "passwordUnmatch": "Die Passwörter stimmen nicht überein",
 
 "home": "Home",
-
+"name": "Name",
 
 "postOverview": "Blog Übersicht",
 "createPost": "Blogeintrag erstellen",
@@ -24,6 +24,8 @@
 "createStatic": "Statische Seite erstellen",
 "userOverview": "Benutzerübersicht",
 "logoff": "Ausloggen",
+"create": "Erstellen",
+"created": "Erstellt",
 
 "ID": "ID",
 "displayName": "Anzeigename",
@@ -48,8 +50,9 @@
 "createPostButton": "Beitrag erstellen",
 "postTitle": "Titel",
 "languageShortcode": "Sprachkürzel",
-"titleExistedError": "Es existiert bereits ein Beitrag mit diesem Namen."
-
+"titleExistedError": "Es existiert bereits ein Beitrag mit diesem Namen.",
+"categories": "Kategorien",
+"addCategory": "Kategorie hinzufügen"
 
 
 }

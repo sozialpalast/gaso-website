@@ -4,15 +4,15 @@ const session = require('express-session')
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 
-function checkboxesToArrays(body, catName, prefix) {
-    body[catName] = [];
+function checkboxesToArrays(body, prefix, additional) {
+    let cats = [];
     for (var i in body) {
         if (i.indexOf(prefix) == 0) {
-            body.categories.push({ "id": body[i] });
+            cats.push({ ...{ "categoryId": body[i] }, ...additional });
             delete body[i];
         }
     }
-    return body;
+    return cats;
 
 }
 
@@ -174,17 +174,38 @@ class webserver extends template {
                 "include": [
                     "postedByUser",
                     "translations",
-                    "postCategories"
+                    {
+                        model: this.category,
+                        as: "postCategories",
+                        include: "translations"
+                    }
                 ]
             });
+            let categories = await this.getCategories(req.query.lang);
             let postList = [];
             posts.forEach(curr => {
                 if (!(!curr.dataValues.postedByUser)) {
                     curr.dataValues.postedByUser = curr.dataValues.postedByUser.dataValues;
+
                 }
+                let newCat = [];
+                curr.postCategories.forEach(currCat => {
+                    if (!!req.query.lang && req.query.lang != currCat.dataValues.language) {
+                        console.log(currCat.dataValues)
+                        currCat.dataValues.translations.forEach(currTrans => {
+                            if (currTrans.dataValues.language == req.query.lang) {
+                                currCat.dataValues.title = currTrans.dataValues.content;
+                            }
+                        })
+                    }
+                    newCat.push(currCat.dataValues);
+                });
+                curr.dataValues.postCategories = newCat;
+                console.log(categories)
                 postList.push(curr.dataValues);
             })
-            res.send(await this.renderTemplate("adminTemplate", "postOverview", req.query.lang, { user: req.session.user, postList: postList }, false));
+            
+            res.send(await this.renderTemplate("adminTemplate", "postOverview", req.query.lang, { user: req.session.user, postList: postList, categories: categories }, false));
             res.end();
         })
         this.app.get("/backend/createPost", async (req, res) => {
@@ -194,24 +215,46 @@ class webserver extends template {
                 return;
             }
             let edit = null;
+            let categories = await this.getCategories(req.query.lang);
             if (!!req.query.edit) {
                 let editPost = await this.post.findOne({
                     "where": {
                         "id": req.query.edit
-                    }
+                    }, include: [
+                        "translations",
+                        "postCategories"
+                    ]
                 });
-                
+                let trans = [];
+                editPost.translations.forEach(curr => {
+                    trans.push(curr.dataValues);
+                })
+                let newCats = [];
+                categories.forEach(currCat => {
+                    editPost.postCategories.forEach(curr => {
+                        if (currCat.id == curr.dataValues.id) {
+                            currCat.checked = true;
+                        }
+                    })
+                    newCats.push(currCat)
+                })
+                categories = newCats;
                 edit = editPost.dataValues;
-                
+                edit.translations = trans;
+
             }
+            
             res.send(
-                await this.renderTemplate("adminTemplate", "createEditPost", req.query.lang, { user: req.session.user, edit: edit }, false)
+                await this.renderTemplate("adminTemplate", "createEditPost", req.query.lang,
+                    {
+                        user: req.session.user, edit: edit, categories: categories
+                    }, false)
             );
             res.end();
         })
         this.app.post("/backend/createPost", async (req, res) => {
             
-            req.body = checkboxesToArrays(req.body, "categories", "_cat");
+        
             if (!req.session.user) {
                 res.redirect("/backend/login");
                 res.end();
@@ -222,7 +265,8 @@ class webserver extends template {
             } else {
                 req.body.visible = false;
             }
-            
+            let categoryList = await this.getCategories(req.query.lang)
+           
             let defaults = req.body;
             defaults.postedBy = req.session.user.id;
             let where = {};
@@ -238,13 +282,27 @@ class webserver extends template {
                 
             });
             console.log(newPost)
+            let cats = checkboxesToArrays(req.body, "_cat", { "postId": newPost.dataValues.id });
+            if (created) {
+                
+                await this.postCategory.bulkCreate(cats);
+            }
             if (!created) {
-
+                // check previously checked cats 
+                let newCats = [];
+                categoryList.forEach(curr => {
+                    cats.forEach(currBod => {
+                        if (currBod.id == curr.id) {
+                            curr.checked = true;
+                        }
+                    })
+                    newCats.push(curr);
+                })
                 // post with this title already existed
                 if (req.body.id != newPost.dataValues.id) {
                     res.send(
                         await this.renderTemplate("adminTemplate", "createEditPost",
-                            req.query.lang, { user: req.session.user, edit: req.body, existed: true }, false)
+                            req.query.lang, { user: req.session.user, edit: req.body, existed: true, categories: newCats }, false)
                     );
                     
                 } else {
@@ -256,6 +314,12 @@ class webserver extends template {
                         newPost[i] = req.body[i];
                     }
                     await newPost.save();
+                    await this.postCategory.destroy({
+                        where: {
+                            postId: newPost.dataValues.id
+                        }
+                    })
+                    await this.postCategory.bulkCreate(cats);
                     res.redirect("/backend/postOverview");
                 }
                 
@@ -265,6 +329,35 @@ class webserver extends template {
             }
             res.end();
         });
+        this.app.get("/backend/createCategory", async (req, res) => {
+            if (!req.session.user) {
+                res.redirect("/backend/login");
+                res.end();
+                return;
+            }
+            res.send(
+                await this.renderTemplate("adminMiniTemplate", "createCategory",
+                    req.query.lang, { user: req.session.user }, false)
+            );
+            res.end();
+        });
+        this.app.post("/backend/createCategory", async (req, res) => {
+            if (!req.session.user) {
+                res.redirect("/backend/login");
+                res.end();
+                return;
+            }
+            if (req.query.lang == undefined) {
+                req.query.lang = this.config.standardLang;
+            }
+            if (req.body.title != undefined && req.body.language != undefined) {
+                await this.category.create({
+                    title: req.body.title,
+                    language: req.body.language
+                });
+                res.end(this.translations[req.query.lang].created);
+            }
+        })
         this.app.get("/backend/logoff", (req, res) => {
             req.session.destroy();
             res.redirect("/backend/login");
