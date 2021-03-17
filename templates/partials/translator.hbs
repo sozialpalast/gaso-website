@@ -1,0 +1,49 @@
+<form method="POST" action="/backend/translator">
+    <div class="row">
+        <div class="col-2">
+            <div class="row">
+
+                <div class="col">
+                    <div class="container">
+                        <h2>{{#if edit}}{{translation.editTranslation}}{{/if}}
+                            {{#unless edit}}{{translation.createTranslation}}{{/unless}}</h2><br>
+                        <label for="language" class="form-label">{{translation.languageShortcode}}</label>
+                        <input type="text" name="language" class="form-control"
+                            value="{{#if edit}}{{edit.language}}{{/if}}{{#unless edit}}{{translation.translationLang}}{{/unless}}" /><br>
+
+
+
+                        {{#if edit}}<input type="hidden" name="edit" value="true">
+                        <input type="hidden" name="id" value="{{edit.id}}" />
+                        <input type="hidden" name="originalId" value="{{original.id}}" />
+                        <input type="hidden" name="translationType" value="{{translationType}}" />{{/if}}
+
+                        <input type="submit" class="btn btn-success" value="{{translation.save}}" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="container">
+                <input type="text" name="title" class="form-control" value="{{edit.title}}"
+                    placeholder="{{translation.staticPageTitle}}"><br>
+                    {{#unless noContent}}
+                <textarea name="content">{{edit.content}}</textarea>
+                {{/unless}}
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="container">
+                <h1>{{original.title}}</h1>
+                <h2>{{original.language}}</h2><br>
+                {{{original.content}}}
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<script>
+    var simplemde = new SimpleMDE({ spellchecker: false });
+</script>

@@ -1,0 +1,62 @@
+<div class="row">
+    <div class="col-9">
+        <div class="container">
+            <table class="table table-striped">
+                <thead>
+        <th scope="col">{{translation.ID}}</th>
+        <th scope="col">{{translation.staticPageName}}</th>
+        <th scope="col">{{translation.staticPageCategories}}</th>
+        <th scope="col">{{translation.staticPageTranslations}}</th>
+        <th scope="col">{{translation.staticPageIsVisible}}</th>
+        <th scope="col">{{translation.createdAt}}</th>
+        <th scope="col">{{translation.createdBy}}</th>
+        <th scope="col">{{translation.actions}}</th>
+    </thead>
+    <tbody>
+        {{#each staticPageList}}
+        <tr>
+            <th scope="row">{{this.id}}</td>
+            <td>{{this.title}}</td>
+            <td>{{#each this.staticPageCategories}}{{this.title}} {{/each}}</td>
+            <td>{{this.language}} {{#each this.translations}}<a href="translator?translationType=staticPage&originalId={{../id}}&edit={{this.id}}">{{this.language}}</a>{{/each}}</td>
+            <td><input type="checkbox" class="form-check-input" disabled {{#if this.visible}}checked{{/if}}></td>
+            <td>{{formatDate this.createdAt}}</td>
+            <td>{{this.postedByUser.displayName}}{{#unless this.postedByUser}}/{{/unless}}</td>
+            <td><a href="/backend/createStaticPage?edit={{this.id}}"><button type="button" class="btn btn-primary">{{../translation.edit}}</button></a>
+            <a href="/backend/translator?originalId={{this.id}}&translationType=staticPage"><button type="button"
+                    class="btn btn-primary">{{../translation.translateNoun}}</button></a></td>
+        </tr>
+        {{/each}}
+    </tbody>
+    </table>
+    </div>
+    
+    </div>
+    <div class="col-3">
+        <div class="container">
+            <h3>{{translation.categories}}:</h3><br>
+            <a href="createCategory"><button type="button" class="btn btn-primary">{{translation.addCategory}}</button></a>
+    
+            <table class="table table-striped">
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">{{translation.name}}</th>
+                    <th scope="col">{{translation.translations}}</th>
+                    <th scope="col">{{translations.actions}}</th>
+                </thead>
+                <tbody>
+                    {{#each categories}}
+                    <tr>
+                        <th scope="row">{{this.id}}</th>
+                        <td>{{this.title}}</td>
+                        <td>{{this.language}} {{#each this.translations}} <a href="translator?translationType=category&originalId={{../id}}&edit={{this.id}}">{{this.language}}</a> {{/each}}</td>
+                        <td><a href="translator?translationType=category&originalId={{this.id}}"><button type="button" class="btn btn-primary">{{../translation.translateNoun}}</button></button></a></td>
+    
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+    
+        </div>
+    </div>
+    </div>

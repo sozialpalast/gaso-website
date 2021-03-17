@@ -1,0 +1,8 @@
+<div class="postPreview">
+    <h2>{{content.title}}</h2><br>
+    {{translation.availableTranslations}}: {{#each post.translations}} <a
+        href="./{{this.language}}/posts/{{this.urlTitle}}.html">{{this.language}}</a> {{/each}}<br>
+    {{#each categories}}{{this.title}} {{/each}}<br>
+    {{translation.postedBy}} {{post.postedByUser.displayName}} {{translation.at}} {{formatDate post.createdAt}}<br><br>
+    {{{content.contentShort}}}
+</div>

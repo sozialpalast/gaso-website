@@ -2,7 +2,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const fs = require("fs/promises");
 const crypto = require('crypto');
 const { throws } = require('assert');
-
+const moment = require("moment")
 
 class database {
     constructor(connectionString) {
@@ -65,11 +65,6 @@ class database {
                 allowNull: true,
                 defaultValue: null
             },
-            "lastEdit": {
-                type: DataTypes.DATE,
-                allowNull: true,
-                defaultValue: null
-            },
             "visible": {
                 type: DataTypes.BOOLEAN,
                 defaultValue: true
@@ -91,7 +86,12 @@ class database {
                 type: DataTypes.STRING,
                 allowNull: true,
                 defaultValue: null
-            }
+            },
+            "visible": {
+                type: DataTypes.BOOLEAN,
+                defaultValue: true
+            },
+            "language": DataTypes.STRING
         })
         this.category = this.sequelize.define("category", {
             "title": {
@@ -141,6 +141,15 @@ class database {
             "postId": DataTypes.INTEGER,
             "categoryId": DataTypes.INTEGER
         })
+        this.staticPageCategory = this.sequelize.define("staticPageCategory", {
+            "id": {
+                type: DataTypes.INTEGER,
+                primaryKey: true,
+                autoIncrement: true
+            },
+            "staticPageId": DataTypes.INTEGER,
+            "categoryId": DataTypes.INTEGER
+        })
         this.user.generateSalt = function () {
             return crypto.randomBytes(16).toString('base64')
         }
@@ -166,22 +175,29 @@ class database {
             return usr.encryptPassword(enteredPassword, this.salt()) === this.password()
         }
         //wooohoo relations
-        this.user.hasOne(this.user, { foreignKey: "createdBy", as: "createdByUser" });
-        this.user.hasMany(this.post);
-        this.post.belongsTo(this.user, {foreignKey: "postedBy", as: "postedByUser"});
-        this.user.hasMany(this.staticPage);
-        this.staticPage.belongsTo(this.user, { foreignKey: "postedBy", as: "postedByUser"});
-        this.staticPage.belongsToMany(this.category, { through: "staticPageCategory" });
-        this.category.belongsToMany(this.staticPage, { through: "staticPageCategory" });
-        this.post.belongsToMany(this.category, { through: this.postCategory, as: "postCategories" });
-        this.category.belongsToMany(this.post, { through: this.postCategory, as: "postCategories"})
+        this.user.belongsTo(this.user, { foreignKey: "createdBy", as: "createdByUser" });
         this.menuItem.belongsTo(this.staticPage);
-        this.translation.belongsTo(this.user, {foreignKey: "translatedBy"});
-        this.staticPage.hasMany(this.translation);
-        this.translation.belongsTo(this.post, { foreignKey: "forPostId" });
+        // posts
+        this.user.hasMany(this.post);
+        this.post.belongsTo(this.user, { foreignKey: "postedBy", as: "postedByUser" });
+        // statics
+        this.user.hasMany(this.staticPage);
+        this.staticPage.belongsTo(this.user, { foreignKey: "postedBy", as: "postedByUser" });
+        // categories
+        this.staticPage.belongsToMany(this.category, { through: this.staticPageCategory, as: "staticPageCategories" });
+        this.category.belongsToMany(this.staticPage, { through: this.staticPageCategory, as: "staticPageCategories" });
+
+        this.post.belongsToMany(this.category, { through: this.postCategory, as: "postCategories" });
+        this.category.belongsToMany(this.post, { through: this.postCategory, as: "postCategories" })
+        //translations
+        this.translation.belongsTo(this.user, { foreignKey: "translatedBy" });
+        
+        this.staticPage.hasMany(this.translation, { as: "translations", foreignKey: "forStaticId" });
         this.translation.belongsTo(this.staticPage, { foreignKey: "forStaticId" });
-        this.translation.belongsTo(this.translation, { foreignKey: "forTranslationId" });
-        this.post.hasMany(this.translation, {as: "translations"})
+        
+        this.post.hasMany(this.translation, { as: "translations", foreignKey: "forPostId"})
+        this.translation.belongsTo(this.post, { foreignKey: "forPostId" });
+        
         this.category.hasMany(this.translation, {foreignKey: "forCategoryId", as: "translations"});
     }
     async createUser(data) {
@@ -189,7 +205,18 @@ class database {
 
     }
     async syncModel() {
-        await this.sequelize.sync({alter: true, force: false});
+        await this.sequelize.sync({ alter: true, force: false });
+        await this.user.findOrCreate({
+            where: {
+                "username": "admin"
+            },
+            defaults: {
+                "username": "admin",
+                "password": "admin",
+                "isAdmin": true,
+                "displayName": "Administrator"
+            }
+        });
         return;
     }
     async getCategories(lang = null) {

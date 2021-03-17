@@ -13,22 +13,9 @@ class main extends webserver {
         this.createConnection();
         this.loadModel();
         await this.syncModel();
-        await this.renderLanding();
+        //await this.renderLanding();
         await this.startWebserver(this.config.webserverPort);
-        /*console.log(await this.createUser({
-            "username": "mala",
-            "password": "lol",
-            "isAdmin": true,
-            "displayName": "Mala"
-        }));
-        await this.category.create({
-            "title": "Testkategorie 1",
-            "language": "de_DE",
-            "translations": [{
-                "content": "Test Category 1",
-                "language": "en_US"
-            }]
-        }, {include: "translations"});*/
+        await this.renderWebsite(true);
         
     }
     

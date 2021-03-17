@@ -1,37 +1,58 @@
-
-<h2>{{#if edit}}{{translation.editPostHeader}}{{/if}}
-    {{#unless edit}}{{translation.createPostHeader}}{{/unless}}</h2>
-
-{{#if existed}} <div class="error">{{translation.titleExistedError}}</div>{{/if}}
 <form method="POST" action="/backend/createPost">
-    <div class="createPostForm">
-    <label for="title">{{translation.postTitle}}</label>
-    <input type="text" name="title" value="{{edit.title}}"><br>
-    <label for="language">{{translation.languageShortcode}}</label>
-    <input type="text" name="language" value="{{#if edit}}{{edit.language}}{{/if}}{{#unless edit}}{{translation.translationLang}}{{/unless}}" /><br>
-    <textarea name="content">{{edit.content}}</textarea><br>
-    <label for="visible">{{translation.postIsVisible}}</label>
-    <input type="checkbox" name="visible" {{#if edit.visible}}checked{{/if}} value="true"/>
-    {{#if edit}}<input type="hidden" name="edit" value="true">
-    <input type="hidden" name="id" value="{{edit.id}}" />{{/if}}
-    <input type="submit" value="{{translation.createPostButton}}" />
+{{#if existed}} <div class="error">{{translation.titleExistedError}}</div>{{/if}}
+
+    <div class="row">
+        <div class="col-3">
+            <div class="col">
+
+                <div class="row">
+                    <div class="container">
+                        <h2>{{#if edit}}{{translation.editPostHeader}}{{/if}}
+                            {{#unless edit}}{{translation.createPostHeader}}{{/unless}}</h2>
+                        <label for="language" class="form-label">{{translation.languageShortcode}}</label>
+                        <input type="text" name="language" class="form-control"
+                            value="{{#if edit}}{{edit.language}}{{/if}}{{#unless edit}}{{translation.translationLang}}{{/unless}}" /><br>
+                        
+                        <input type="checkbox" class="form-check-input" name="visible" {{#if edit.visible}}checked{{/if}} value="true" />
+                        <label for="visible" class="form-check-label">{{translation.postIsVisible}}</label> <br>
+                        {{#if edit}}<input type="hidden" name="edit" value="true">
+                        <input type="hidden" name="id" value="{{edit.id}}" />{{/if}}
+                        <input type="submit" class="btn btn-success" value="{{translation.createPostButton}}" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="container">
+                        <h3>{{translation.categories}}:</h3><br>
+                        
+                            {{#each categories}}
+                            
+                                <input type="checkbox" class="form-check-input" name="_cat{{this.id}}" value="{{this.id}}" {{#if
+                                    this.checked}}checked{{/if}} />
+                                <label class="form-check-label" for="_cat{{this.id}}">{{this.title}}</label> <br>
+                            
+                            {{/each}}
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-9">
+
+            <label for="title" class="form-label">{{translation.postTitle}}</label>
+            <input type="text" class="form-control" name="title" value="{{edit.title}}"><br>
+            <textarea name="content">{{edit.content}}</textarea><br>
+        </div>
     </div>
-<div class="categoriesCheckboxes">
-    <h3>{{translation.categories}}:</h3><br>
-    <ul>
-        {{#each categories}}
-        <li>
-            <input type="checkbox" name="_cat{{this.id}}" value="{{this.id}}" {{#if this.checked}}checked{{/if}}/>
-            <label for="_cat{{this.id}}">{{this.title}}</label>
-        </li>
-        {{/each}}
-        <li><a href="/backend/addCategory" target="_TOP">{{translation.addCategory}}</a></li>
-    </ul>
-</div>
+</form>
+
+
+
+
+
 
 
 
 </form>
 <script>
-    var simplemde = new SimpleMDE({spellchecker: false});
+    var simplemde = new SimpleMDE({ spellchecker: false });
 </script>

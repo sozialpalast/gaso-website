@@ -1,40 +1,73 @@
-<table class="postOverviewTable">
-    <thead>
-        <th>{{translation.ID}}</th>
-        <th>{{translation.postName}}</th>
-        <th>{{translation.postCategories}}</th>
-        <th>{{translation.postTranslations}}</th>
-        <th>{{translation.postIsVisible}}</th>
-        <th>{{translation.createdAt}}</th>
-        <th>{{translation.createdBy}}</th>
-        <th>{{translation.actions}}</th>
-    </thead>
-    <tbody>
-        {{#each postList}}
-        <tr>
-            <td>{{this.id}}</td>
-            <td>{{this.title}}</td>
-            <td>{{#each this.postCategories}}{{this.title}} {{/each}}</td>
-            <td>{{this.language}} {{#each this.translations}}{{this.language}}{{/each}}</td>
-            <td><input type="checkbox" disabled {{#if this.visible}}checked{{/if}}></td>
-            <td>{{this.createdAt}}</td>
-            <td>{{this.postedByUser.displayName}}{{#unless this.postedByUser}}/{{/unless}}</td>
-            <td><a href="/backend/createPost?edit={{this.id}}"><button>{{../translation.edit}}</button></a></td>
-        </tr>
-        {{/each}}
-    </tbody>
-</table>
-{{#if categories}}
-<div class="categoriesCheckboxes">
-    <h3>{{translation.categories}}:</h3><br>
-    <ul>
-        {{#each categories}}
-        <li>
-            
-            ID {{this.id}}: {{this.title}} - {{this.language}} {{#each this.translations}} {{this.language}} {{/each}}
-        </li>
-        {{/each}}
-        <li><a href="/backend/createCategory" target="_blank">{{translation.addCategory}}</a></li>
-    </ul>
+<div class="row">
+    <div class="col-9">
+        <div class="container">
+            <table class="table table-striped">
+                <thead>
+                    <th scope="col">{{translation.ID}}</th>
+                    <th scope="col">{{translation.postName}}</th>
+                    <th scope="col">{{translation.postCategories}}</th>
+                    <th scope="col">{{translation.postTranslations}}</th>
+                    <th scope="col">{{translation.postIsVisible}}</th>
+                    <th scope="col">{{translation.createdAt}}</th>
+                    <th scope="col">{{translation.createdBy}}</th>
+                    <th scope="col">{{translation.actions}}</th>
+                </thead>
+                <tbody>
+                    {{#each postList}}
+                    <tr>
+                        <th scope="row">{{this.id}}</td>
+                        <td>{{this.title}}</td>
+                        <td>{{#each this.postCategories}}{{this.title}} {{/each}}</td>
+                        <td>{{this.language}} {{#each this.translations}}<a
+                                href="translator?translationType=post&originalId={{../id}}&edit={{this.id}}">{{this.language}}</a>
+                            {{/each}}</td>
+                        <td><input type="checkbox" class="form-check-input" disabled {{#if this.visible}}checked{{/if}}>
+                        </td>
+                        <td>{{formatDate this.createdAt}}</td>
+                        <td>{{this.postedByUser.displayName}}{{#unless this.postedByUser}}/{{/unless}}</td>
+                        <td><a href="/backend/createPost?edit={{this.id}}"><button type="button"
+                                    class="btn btn-primary">{{../translation.edit}}</button></a>
+                            <a href="/backend/translator?originalId={{this.id}}&translationType=post"><button
+                                    type="button"
+                                    class="btn btn-primary">{{../translation.translateNoun}}</button></a>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <div class="col-3">
+        <div class="container">
+            <h3>{{translation.categories}}:</h3><br>
+            <a href="createCategory"><button type="button"
+                    class="btn btn-primary">{{translation.addCategory}}</button></a>
+
+            <table class="table table-striped">
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">{{translation.name}}</th>
+                    <th scope="col">{{translation.translations}}</th>
+
+                    <th scope="col">{{translations.actions}}</th>
+                </thead>
+                <tbody>
+                    {{#each categories}}
+                    <tr>
+                        <th scope="row">{{this.id}}</th>
+                        <td>{{this.title}}</td>
+                        <td>{{this.language}} {{#each this.translations}} <a
+                                href="translator?translationType=category&originalId={{../id}}&edit={{this.id}}">{{this.language}}</a>
+                            {{/each}}
+                        </td>
+                        <td><a href="translator?translationType=category&originalId={{this.id}}"><button type="button"
+                                    class="btn btn-primary">{{../translation.translateNoun}}</button></button></a></td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
 </div>
-{{/if}}

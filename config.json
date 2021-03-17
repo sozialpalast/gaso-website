@@ -1,8 +1,15 @@
 {
-    "sequelize_db": "sqlite:./db.sqlite",
+    "sequelize_db": "mariadb://root:9912@localhost:3306/gazo",
     "cookieSecret": "yeet",
     "standardLang": "de_DE",
+    "fallbackLang": "de_DE",
     "homepageBaseTemplate": "baseTemplate",
-    "homepageTemplate": "landing",
-    "webserverPort": 8081
+    "homepageTemplate": "posts",
+    "webserverPort": 8081,
+    "redisSession": true,
+    "dateFormat": "DD.MM.YYYY h:mm",
+    "htmlLocation": "/tmp/gazo",
+    "postPreviewLenght": 250
+
+
 }

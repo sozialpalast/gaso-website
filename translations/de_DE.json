@@ -14,9 +14,11 @@
 "loginButton": "Einloggen",
 "loginFailed": "Dein Login oder Passwort ist leider falsch :(",
 "passwordUnmatch": "Die Passwörter stimmen nicht überein",
+"renderWebsite": "Website rendern",
 
 "home": "Home",
 "name": "Name",
+"save": "Speichern",
 
 "postOverview": "Blog Übersicht",
 "createPost": "Blogeintrag erstellen",
@@ -29,14 +31,28 @@
 
 "ID": "ID",
 "displayName": "Anzeigename",
-"postName": "Beitragsname",
-"postCategories": "Kategorien",
-"postIsVisible": "Sichtbar",
+
 "isAdmin": "Admin?",
 "createdAt": "Erstellt am",
 "createdBy": "Erstellt von",
 "actions": "Aktionen",
 "edit": "Bearbeiten",
+
+"createPostHeader": "Neuen Beitrag erstellen",
+"editPostHeader": "Beitrag bearbeiten",
+"createPostButton": "Beitrag erstellen",
+"postTitle": "Titel",
+"postName": "Beitragsname",
+"postCategories": "Kategorien",
+"postIsVisible": "Sichtbar",
+
+"createStaticPageHeader": "Neue Seite erstellen",
+"editStaticPageHeader": "Seite bearbeiten",
+"createStaticPageButton": "Seite erstellen",
+"staticPageTitle": "Titel",
+"staticPageName": "Seitenname",
+"staticPageCategories": "Kategorien",
+"staticPageIsVisible": "Sichtbar",
 
 "usernamePlaceholder": "hans",
 "displayNamePlaceholder": "Hans Wurst",
@@ -45,14 +61,20 @@
 "deleteUserCheckbox": "Benutzer:in löschen",
 "createUserButton": "Erstellen",
 
-"createPostHeader": "Neuen Beitrag erstellen",
-"editPostHeader": "Beitrag bearbeiten",
-"createPostButton": "Beitrag erstellen",
-"postTitle": "Titel",
+
 "languageShortcode": "Sprachkürzel",
-"titleExistedError": "Es existiert bereits ein Beitrag mit diesem Namen.",
+"titleExistedError": "Es existiert bereits ein Objekt mit diesem Namen.",
 "categories": "Kategorien",
-"addCategory": "Kategorie hinzufügen"
+"addCategory": "Kategorie hinzufügen",
+
+"createTranslation": "Übersetzung hinzufügen",
+"editTranslation": "Übersetzung bearbeiten",
+"translateNoun": "Übersetzen",
+
+"postedBy": "Veröffentlicht von",
+"at": "am",
+"availableTranslations": "Available Translations"
+
 
 
 }

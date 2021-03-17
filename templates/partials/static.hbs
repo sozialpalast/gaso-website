@@ -1,6 +1,6 @@
 <!-- Template für statische Seiten -->
-STATIC PAGE<br>
-POST PAGE
-<h2>{{title}}</h2><br>
-{{translation.postedby}} {{postedBy}} {{translation.on}} {{createdAt}}<br><br>
-{{content}}
+<h2>{{content.title}}</h2><br>
+{{translation.availableTranslations}}: {{#each page.translations}} <a href="..//{{this.language}}/{{this.urlTitle}}.html">{{this.language}}</a> {{/each}}<br>
+{{#each categories}}{{this.title}} {{/each}}<br>
+{{translation.createdBy}} {{page.postedByUser.displayName}} {{translation.at}} {{formatDate page.createdAt}}<br><br>
+{{content.content}}
