@@ -1,7 +1,7 @@
 {
     "stylesheetLink": "/static/stylesheets/main.css",
-    "title": "gaso_ms",
-    "mainLogoLink": "/static/img/gaso.svg",
+    "title": "gazo_ms",
+    "mainLogoLink": "/static/img/gazo.svg",
     "mainMenu": [
         {
             "link": "/",

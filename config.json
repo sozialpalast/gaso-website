@@ -9,7 +9,8 @@
     "redisSession": true,
     "dateFormat": "DD.MM.YYYY h:mm",
     "htmlLocation": "/tmp/gazo",
-    "postPreviewLenght": 250
+    "postPreviewLenght": 250,
+    "postsPerPage": 10
 
 
 }

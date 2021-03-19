@@ -14,8 +14,23 @@ class template extends database {
         this.translations = {}
         this.htmls = {};
         this.sanitizeHtml = sanitizeHtml;
-        
-        
+
+
+    }
+    async copyDir(src, dest) {
+        const entries = await fs.readdir(src, { withFileTypes: true });
+        await fs.mkdir(dest).catch(Err => {
+            console.log(dest + " existed")
+        });
+        for (let entry of entries) {
+            const srcPath = src + "/" + entry.name;
+            const destPath = dest + "/" +  entry.name;
+            if (entry.isDirectory()) {
+                await this.copyDir(srcPath, destPath);
+            } else {
+                await fs.copyFile(srcPath, destPath);
+            }
+        }
     }
     renderAndSanitizeMD(input) {
         if (input == null) {
@@ -28,7 +43,7 @@ class template extends database {
         return input;
     }
     async loadTemplates() {
-        
+
         // loads templates to memory for further processing
         try {
             let baseTemplateList = await fs.readdir("templates");
@@ -68,7 +83,7 @@ class template extends database {
             this.baseTemplates[template] = handlebars.compile(this.baseTemplateFiles[template]);
             console.log("Compiled ", template)
         }
-        
+
     }
     async initTemplate() {
         await this.loadConfig();
@@ -103,7 +118,7 @@ class template extends database {
     renderTemplate(baseTemplate, template = "NoTemplate", translation = this.config.standardLang, data, write = true, writepath, useStandardData = true) {
         data = { ...{ translation: { ...this.translations[this.config.fallbackLang], ...this.translations[translation] } }, ...data };
         data.template = template;
-        console.log(data);
+        //console.log(data);
         if (useStandardData) {
             data = { ...this.standardData, ...data };
         }
@@ -115,7 +130,7 @@ class template extends database {
         let content = this.baseTemplates[baseTemplate](data);
         if (!this.htmls[baseTemplate])
             this.htmls[baseTemplate] = {};
-        if (!this.htmls[baseTemplate][template]) 
+        if (!this.htmls[baseTemplate][template])
             this.htmls[baseTemplate][template] = {}
         this.htmls[baseTemplate][template][translation] = content;
         if (write) {
@@ -125,9 +140,10 @@ class template extends database {
     }
     async writer(writepath, content) {
         await fs.writeFile(writepath, content, "utf-8");
+        console.log("Wrote " + writepath)
 
     }
-    async renderLanding(write) {
+    async renderLanding(save) {
         console.log(" RENDER BASE ")
         let postList = [];
         let queryData = {
@@ -149,8 +165,8 @@ class template extends database {
                 "visible": true
             }
         }
-        
 
+        let upper = this
         let systemTrans = this.translations;
         let backupLang = this.config.backupLang;
         let posts = await this.post.findAll(queryData);
@@ -168,7 +184,7 @@ class template extends database {
                     trans.push(curr.dataValues);
                 });
                 post.dataValues.translations = trans;
-                
+
                 trans.forEach(async curr => {
                     if (curr.language == systemTrans[i].translationLang) {
                         // correct language!
@@ -192,17 +208,56 @@ class template extends database {
                             cats.push(currCat.dataValues);
                         }
                     })
-                    
+
                     output = { content: curr, post: post.dataValues, categories: cats }
                 })
                 postList.push(output);
 
 
             })
-            this.renderTemplate(this.config.homepageBaseTemplate, this.config.homepageTemplate, this.translations[i].translationLang, {post: postList}, true, this.config.htmlLocation + "/" + this.translations[i].translationLang + "/index.html");
+
+            function render(pageNumber = 0, path = null, nextPagePre = "") {
+                let localPostList = [];
+                if (path == null) path = `${upper.config.htmlLocation}/${upper.translations[i].translationLang}/index.html`;
+                let pagination = {
+                    currentPage: pageNumber + 1,
+                    totalPosts: postList.length,
+                    totalPages: Math.ceil(postList.length / upper.config.postsPerPage),
+                    nextPageURL: `${nextPagePre}postsPage${pageNumber + 2}.html`
+                }
+                if (pageNumber == null || pageNumber == 0) {
+                    // page number not given, rendering page one
+                    localPostList = postList.slice(0, upper.config.postsPerPage);
+                } else {
+                    console.log("PAGE NUMBER NO NULL")
+                    localPostList = postList.slice((pageNumber) * upper.config.postsPerPage,
+                        (pageNumber) * upper.config.postsPerPage + upper.config.postsPerPage - 1);
+                    path = `${upper.config.htmlLocation}/${upper.translations[i].translationLang}/postsPage${pageNumber + 1}.html`
+                    if (pageNumber == 1) {
+                        pagination.lastPageURL = "index.html"
+                    } else {
+                        pagination.lastPageURL = `postsPage${pageNumber + -1}.html`
+                    }
+                    if (pageNumber + 1 == pagination.totalPages) {
+                        delete pagination.nextPageURL
+                    }
+                }
+
+                upper.renderTemplate(upper.config.homepageBaseTemplate, upper.config.homepageTemplate, upper.translations[i].translationLang,
+                    { post: localPostList, pagination: pagination }, save, path);
+            }
+            for (var o = 0; o < (Math.floor(postList.length / upper.config.postsPerPage) + 1); o++) {
+                render(o);
+            }
+
+            // if the current language is the standard lang, render page one to the standard html location /index!
+            if (this.translations[i].translationLang == this.config.standardLang) {
+                render(0, `${this.config.htmlLocation}/index.html`, `${this.config.standardLang}/`)
+            }
+
         }
-        
-        
+
+
     }
     async createFolderStructure(base) {
         let languageQuery = await this.translation.findAll(
@@ -224,7 +279,7 @@ class template extends database {
                 return;
             }
         }
-        
+
     }
     titleUrlSafe(title) {
         return title.replaceAll(" ", "-")
@@ -270,7 +325,7 @@ class template extends database {
                 trans.push(curr.dataValues);
             });
             page.dataValues.translations = trans;
-            
+
             trans.forEach(async curr => {
                 let cats = []
                 page.dataValues.staticPageCategories.forEach(currCat => {
@@ -291,14 +346,14 @@ class template extends database {
                     page: page.dataValues,
                     categories: cats
                 }, save, upper.config.htmlLocation + "/" + curr.language + "/" + curr.urlTitle + ".html");
-                htmls.push({id: page.dataValues.id, language: curr.language, html: html})
+                htmls.push({ id: page.dataValues.id, language: curr.language, html: html })
             })
 
-            
+
         })
         return htmls;
-    
-        
+
+
     }
     async renderPost(save, id = null, lang = null) {
         let upper = this;
@@ -374,6 +429,9 @@ class template extends database {
         await this.renderStaticPage(save);
         await this.renderPost(save)
         await this.renderLanding(save);
+
+        // now copy static files to new path!
+        await this.copyDir("./web", this.config.htmlLocation)
     }
 }
 

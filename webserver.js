@@ -47,6 +47,7 @@ class webserver extends template {
         console.log("Webserver online @:" + port);
     }
     async registerFrontends() {
+        
         this.app.get("/", (req, res) => {
             try {
                 console.log(this.htmls)
@@ -58,8 +59,11 @@ class webserver extends template {
                 console.log(e);
             }
         })
+        this.app.use(express.static("web"));
+        this.app.use(express.static(this.config.htmlLocation))
     }
     async registerBackend() {
+        this.app.use(express.static("web"));
         this.app.post("/backend/login", async (req, res) => {
 
             let loginUser = await this.user.findOne({

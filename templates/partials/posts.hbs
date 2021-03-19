@@ -4,3 +4,8 @@
     {{/each}}
 
 </div>
+<div class="pagination">
+    {{#if pagination.lastPageURL}}<a href="{{pagination.lastPageURL}}">{{translation.lastPage}}</a>{{/if}}
+    {{translation.site}} {{pagination.currentPage}} {{translation.of}} {{pagination.totalPages}}
+    {{#if pagination.nextPageURL}}<a href="{{pagination.nextPageURL}}">{{translation.nextPage}}</a>{{/if}}
+</div>

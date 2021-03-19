@@ -31,6 +31,10 @@
 
 "ID": "ID",
 "displayName": "Anzeigename",
+"nextPage": "Nächste Seite",
+"lastPage": "Letzte Seite",
+"page": "Seite",
+"of": "von",
 
 "isAdmin": "Admin?",
 "createdAt": "Erstellt am",
