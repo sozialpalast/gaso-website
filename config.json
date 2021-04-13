@@ -4,7 +4,7 @@
     "standardLang": "de_DE",
     "fallbackLang": "de_DE",
     "homepageBaseTemplate": "baseTemplate",
-    "homepageTemplate": "posts",
+    "homepageTemplate": "landing",
     "webserverPort": 8081,
     "redisSession": true,
     "dateFormat": "DD.MM.YYYY h:mm",

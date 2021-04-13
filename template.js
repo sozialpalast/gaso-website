@@ -116,7 +116,7 @@ class template extends database {
         this.standardData = JSON.parse(await fs.readFile("./standardData.json", "utf-8"));
     }
     renderTemplate(baseTemplate, template = "NoTemplate", translation = this.config.standardLang, data, write = true, writepath, useStandardData = true) {
-        data = { ...{ translation: { ...this.translations[this.config.fallbackLang], ...this.translations[translation] } }, ...data };
+        data = { ...{ translation: { ...this.translations[this.config.fallbackLang], ...this.translations[translation] }, systemTranslations: this.translations }, ...data };
         data.template = template;
         //console.log(data);
         if (useStandardData) {
@@ -243,7 +243,7 @@ class template extends database {
                     }
                 }
 
-                upper.renderTemplate(upper.config.homepageBaseTemplate, upper.config.homepageTemplate, upper.translations[i].translationLang,
+                upper.renderTemplate(upper.config.homepageBaseTemplate, (pageNumber > 0) ? "posts" : upper.config.homepageTemplate, upper.translations[i].translationLang,
                     { post: localPostList, pagination: pagination }, save, path);
             }
             for (var o = 0; o < (Math.floor(postList.length / upper.config.postsPerPage) + 1); o++) {
@@ -252,7 +252,7 @@ class template extends database {
 
             // if the current language is the standard lang, render page one to the standard html location /index!
             if (this.translations[i].translationLang == this.config.standardLang) {
-                render(0, `${this.config.htmlLocation}/index.html`, `${this.config.standardLang}/`)
+                render(0, `${this.config.htmlLocation}/index.html`, `${this.config.standardLang}/`, true)
             }
 
         }

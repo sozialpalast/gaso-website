@@ -67,6 +67,7 @@
 
 
 "languageShortcode": "Sprachkürzel",
+"language": "Sprache",
 "titleExistedError": "Es existiert bereits ein Objekt mit diesem Namen.",
 "categories": "Kategorien",
 "addCategory": "Kategorie hinzufügen",

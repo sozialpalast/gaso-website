@@ -1,4 +1,4 @@
-<!-- BaseTemplate -->
+<!-- baseTemplate.hbs -->
 <!DOCTYPE html>
 <html>
     <head>
@@ -11,6 +11,13 @@
             <ul class="mainMenu mainMenuList">
                 {{#each mainMenu}}
                 <li class="mainMenuItem"><a class="mainMenuItem" href="{{{link}}}">{{text}}</a></li>
+                {{/each}}
+            </ul>
+            
+            {{translation.language}}:
+            <ul class="systemLanguages systemLanguageList">
+                {{#each systemTranslations}}
+                <li class="systemLanguageItem"><a class="systemLanguageItem" href="/{{this.translationLang}}/index.html">{{this.translationLangNameEnglish}}</a></li>
                 {{/each}}
             </ul>
         </div>
